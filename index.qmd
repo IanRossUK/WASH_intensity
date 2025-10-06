@@ -1,0 +1,40 @@
+---
+title: "WASH intensity"
+format:
+  gfm:
+    output-file: README
+  html:
+    output-file: index
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(tidyverse)
+
+```
+
+## Intensity of WASH interventions
+
+This repository contains the data and code necessary to reproduce results from Ross et al. "Does intensity of household promotion visits modify effectiveness of handwashing with soap and point-of-use water treatment interventions? Systematic re-review and meta-regression".
+
+The manuscript is yet to be submitted or pre-printed, but URLs will be added here in due course.
+
+Documents to reproduce results are here:
+
+<https://github.com/IanRossUK/WASH_intensity/>
+
+Original analyses were in Stata 18, so .dta and .do files are the main output provided. We also provide .csv files for importing data into other packages. Folders are structured as 1_code, 2_input, and 3_output.
+
+## Code
+
+There is one code .do for each of the three interventions types (handwashing, chlorination, pooled), and a master .do which runs all three in turn.
+
+## Data
+
+There is one .dta for each of the three intervention types.
+
+## Output
+
+Folders are populated automatically with spreadsheets and graphs as the code is run.
