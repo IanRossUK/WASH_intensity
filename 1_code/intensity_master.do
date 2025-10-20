@@ -19,13 +19,13 @@ set varabbrev off
 **************************************************************************
 
 cd $github/1_code
-do analysis_hwws_intensity_6oct25
+do analysis_hwws_intensity_16oct25
 
 cd $github/1_code
-do analysis_hwt_intensity_6oct25
+do analysis_hwt_intensity_16oct25
 
 cd $github/1_code
-do analysis_pooled_intensity_6oct25
+do analysis_pooled_intensity_16oct25
 
 *
 

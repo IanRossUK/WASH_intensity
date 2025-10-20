@@ -323,6 +323,8 @@ cd $github/2_input
 use hwt_intensity
 cd $github/3_output/sensitivity_hwt/cont
 
+keep if int_type == "chlorination"
+
 drop if total_hh_visits == 0 | total_hh_visits == 1
 
 *scatter
@@ -365,7 +367,56 @@ drop if total_hh_visits == 0 | total_hh_visits == 1
 
 
 
-*6. Incl monitoring visits
+*6. Leave one out
+*//////////////////////////////////////////////////////////
+
+
+clear
+cd $github/2_input
+use hwt_intensity
+
+keep if int_type == "chlorination"
+
+list study if total_hh_visits == 0 | total_hh_visits == 1
+drop if total_hh_visits == 0 | total_hh_visits == 1 
+
+gen id = _n
+list study id
+cd $github/3_output/sensitivity_hwt/leaveoneout
+
+*DD freq
+	meta set dd_ln_es dd_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hwt_s6_ddfreq.xlsx, sheet(example1) replace
+forvalues i = 1(1)18 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.freq_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	list study id if dd_ln_es == .
+
+
+*DD visnum
+	meta set dd_ln_es dd_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hwt_s6_ddvisnum.xlsx, sheet(example1) replace
+forvalues i = 1(1)18 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.visnum_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	list study id if dd_ln_es == .
+
+	
+
+
+*7. Incl monitoring visits
 *//////////////////////////////////////////////////////////
 
 

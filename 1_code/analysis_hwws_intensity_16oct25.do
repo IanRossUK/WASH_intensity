@@ -436,6 +436,12 @@ cd $github/3_output/sensitivity_hwws/3level
 	graph export ari_metan_visnum_s4.png, replace
 	meta summ, subgroup(visnum2)  eform(Risk ratios)
 
+		matrix list r(esgroup) /// need to exponentiate
+	
+	matrix ES = r(esgroup)
+	putexcel B33 = matrix(ES), rownames nformat(number_d2)
+
+	
 	meta regress i.visnum2, random(dlaird)
 
 	matrix output = r(table)
@@ -452,6 +458,11 @@ cd $github/3_output/sensitivity_hwws/3level
 	meta forestplot, subgroup(visnum2) nullrefline esrefline eform(Risk ratios)
 	graph export dd_metan_visnum_s4.png, replace
 	meta summ, subgroup(visnum2)  eform(Risk ratios)
+
+		matrix list r(esgroup) /// need to exponentiate
+	
+	matrix ES = r(esgroup)
+	putexcel B41 = matrix(ES), rownames nformat(number_d2)
 
 	meta regress i.visnum2, random(dlaird)
 
@@ -552,7 +563,81 @@ drop if total_hh_visits == 0 | total_hh_visits == 1 /// 6 dropped
 		
 }
 
-*6. Incl monitoring visits
+*6. Leave one out
+*//////////////////////////////////////////////////////////
+
+
+clear
+cd $github/2_input
+use hwws_intensity
+list study if total_hh_visits == 0 | total_hh_visits == 1
+drop if total_hh_visits == 0 | total_hh_visits == 1 
+
+gen id = _n
+list study id
+cd $github/3_output/sensitivity_hwws/leaveoneout
+
+*ARI freq
+	meta set ari_ln_es ari_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hw_s6_arifreq.xlsx, sheet(example1) replace
+	meta regress i.freq_prim, random(dlaird)	 
+forvalues i = 1(1)17 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.freq_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	list study id if ari_ln_es == .
+
+
+*DD freq
+	meta set dd_ln_es dd_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hw_s6_ddfreq.xlsx, sheet(example1) replace
+forvalues i = 1(1)17 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.freq_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	list study id if dd_ln_es == .
+
+*ARI visnum
+	meta set ari_ln_es ari_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hw_s6_arivisnum.xlsx, sheet(example1) replace
+forvalues i = 1(1)17 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.visnum_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	 list study id if ari_ln_es == .
+	 
+*DD visnum
+	meta set dd_ln_es dd_ln_se, random(dlaird) studylabel(study)
+	putexcel set metareg_hw_s6_ddvisnum.xlsx, sheet(example1) replace
+forvalues i = 1(1)17 {
+	 preserve
+	 drop if id == `i'
+	 meta regress i.visnum_prim, random(dlaird)	 
+	 matrix output = r(table)
+	 putexcel A`i' = `e(p)'
+	 putexcel B`i' = matrix(output), rownames nformat(number_d2)
+	 restore
+	 } 
+	list study id if dd_ln_es == .
+
+	
+
+*7. Incl monitoring visits
 *//////////////////////////////////////////////////////////
 
 
@@ -651,6 +736,8 @@ cd $github/3_output/sensitivity_hwws/mon_visits
 	putexcel D4 = `r(I2)'
 
 }
+
+
 
 graph close
 clear
